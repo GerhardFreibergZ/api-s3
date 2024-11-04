@@ -4,11 +4,12 @@ service: api-s3
 provider:
   name: aws
   runtime: python3.12	
-  # Default memory size for functions (default: 256MB)
   memorySize: 256
   timeout: 30
   iam:
-    role: arn:aws:iam::980106331918:role/LabRole    
+    role: arn:aws:iam::980106331918:role/LabRole
+  environment:
+    STAGE: ${opt:stage, 'dev'}
 
 functions:
   lista_buckets:
@@ -20,6 +21,7 @@ functions:
           method: get
           cors: true
           integration: lambda
+
   lista_objetos_bucket:
     handler: lista_objetos_bucket.lambda_handler
     events:
@@ -28,3 +30,37 @@ functions:
           method: post
           cors: true
           integration: lambda
+
+  crear_bucket:
+    handler: crear_bucket.lambda_handler
+    events:
+      - http:
+          path: /s3/crear-bucket
+          method: post
+          cors: true
+          integration: lambda
+
+  crear_directorio:
+    handler: crear_directorio.lambda_handler
+    events:
+      - http:
+          path: /s3/{bucket}/crear-directorio
+          method: post
+          cors: true
+          integration: lambda
+
+  subir_archivo:
+    handler: subir_archivo.lambda_handler
+    events:
+      - http:
+          path: /s3/{bucket}/subir-archivo
+          method: post
+          cors: true
+          integration: lambda
+
+resources:
+  Resources:
+    IngestaBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: my-ingesta-bucket-${opt:stage, 'dev'}
