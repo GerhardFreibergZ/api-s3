@@ -4,6 +4,7 @@ import base64
 def lambda_handler(event, context):
     # Entrada
     bucket = event['body']['bucket']
+    directorio = event['body']['directorio']
     nombre_archivo = event['body']['nombre_archivo']
     contenido_archivo = base64.b64decode(event['body']['contenido_archivo'])
 
